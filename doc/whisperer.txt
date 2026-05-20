@@ -1,0 +1,188 @@
+*whisperer.txt*  Natural-language to Vim motions for beginners
+
+==============================================================================
+CONTENTS                                                  *whisperer-contents*
+
+    1. Introduction ........................... |whisperer-intro|
+    2. Installation ........................... |whisperer-install|
+    3. Quick start ............................ |whisperer-quickstart|
+    4. Commands ............................... |whisperer-commands|
+    5. Configuration .......................... |whisperer-config|
+    6. Local context awareness ................ |whisperer-context|
+    7. Macro teaching flow .................... |whisperer-teach|
+    8. Privacy ................................ |whisperer-privacy|
+
+==============================================================================
+1. INTRODUCTION                                              *whisperer-intro*
+
+Whisperer translates plain English into Vim motions. It is aware of the user's
+own keymaps (from LazyVim, NvChad, kickstart.nvim, AstroNvim, or hand-rolled
+configs) and recommends the binding *they* have mapped, not vanilla defaults.
+
+If no built-in motion or user keymap covers an action, Whisperer walks the
+user through recording a |Q| macro and saves it as a named, recallable
+command.
+
+Backends: Anthropic Claude, OpenAI, or Gemini. Configurable at runtime.
+
+==============================================================================
+2. INSTALLATION                                            *whisperer-install*
+
+Requires Neovim 0.10 or later and `curl` available on PATH.
+
+With lazy.nvim: >
+    {
+      "<othorizedshogun/vim-whisperer.nvim",
+      cmd = { "Whisperer", "WhispererConfig" },
+      opts = {},
+    }
+<
+
+==============================================================================
+3. QUICK START                                          *whisperer-quickstart*
+
+1. `:AskConfig` — pick provider, paste API key. (Long form: `:WhispererConfig`.)
+2. `:Ask delete word` — see (or run) `dw`.
+3. `:Ask` (no arg) — opens an input prompt.
+
+`:Ask` is the short alias for `:Whisperer`. Both forms are interchangeable;
+the short form is recommended for everyday use.
+
+The result float now shows two keystroke lines for beginners:
+    Motion: :w<CR>           the raw vim notation
+    Type:   : w Enter        the human-readable keystrokes
+
+In the result float, these keys work:
+    <CR>     execute the motion
+    e        show a longer explanation
+    t        record a macro for this action
+    a        toggle auto-execute for this session
+    q        close
+
+==============================================================================
+4. COMMANDS                                              *whisperer-commands*
+
+Short aliases (:Ask*) for everyday use; long forms (:Whisperer*) for
+discoverability and tab-completion. They are interchangeable.
+
+                                                       *:Ask* *:Whisperer*
+:Ask [{query}]                  ~
+:Whisperer [{query}]
+    Main entry. With no argument, opens an input prompt. With an argument,
+    treats it as the natural-language query.
+
+                                            *:AskConfig* *:WhispererConfig*
+:AskConfig                      ~
+:WhispererConfig
+    Wizard: pick a provider, enter the API key. Persists to
+    `stdpath('data')/whisperer/config.json` with file mode 0600.
+
+                                            *:AskTeach* *:WhispererTeach*
+:AskTeach [{name}]              ~
+:WhispererTeach [{name}]
+    Manually start the macro-recording flow.
+
+                                          *:AskExplain* *:WhispererExplain*
+:AskExplain [{query}]           ~
+:WhispererExplain [{query}]
+    Same as :Ask but never offers Execute, only explains.
+
+                                                          *:WhispererProvider*
+:WhispererProvider {anthropic|openai|gemini}
+    Switch the active provider without re-entering its key.
+
+                                                              *:WhispererKey*
+:WhispererKey [{provider}]
+    Rotate the key for one provider (default: active provider).
+
+                                                          *:WhispererMacros*
+:WhispererMacros
+    Open a scratch buffer listing saved user macros.
+
+                                                          *:WhispererContext*
+:WhispererContext
+    Print the local-context bundle (distro, plugins, keymaps, filetype).
+    Use this to audit exactly what is sent to the LLM.
+
+                                                  *:WhispererRefreshContext*
+:WhispererRefreshContext
+    Re-scan keymaps and detected plugins. Run after editing your config and
+    `:source`-ing it.
+
+                                                              *:WhispererLog*
+:WhispererLog
+    Last LLM request/response. API key is redacted.
+
+                                                  *:WhispererToggleAutoExec*
+:WhispererToggleAutoExec
+    Flip the |whisperer-config| `auto_execute` flag.
+
+==============================================================================
+5. CONFIGURATION                                          *whisperer-config*
+
+`require('whisperer').setup({...})` accepts: >
+
+    require("whisperer").setup({
+      provider = "anthropic",
+      models = {
+        anthropic = "claude-haiku-4-5-20251001",
+        openai    = "gpt-4o-mini",
+        gemini    = "gemini-2.0-flash",
+      },
+      timeout_ms = 30000,
+      fuzzy_threshold = 0.6,
+      auto_execute = false,
+      auto_execute_min_confidence = 0.85,
+      send_local_context = true,
+      context_max_bytes = 4096,
+      ui = { border = "rounded", width = 0.6, height = 0.4 },
+      keymap = { ask = nil, teach = nil }, -- prefer lazy.nvim's keys block
+      log_level = "warn",
+    })
+<
+
+`auto_execute` can be flipped at runtime via |:WhispererToggleAutoExec|.
+
+==============================================================================
+6. LOCAL CONTEXT AWARENESS                              *whisperer-context*
+
+Beginners rarely use vanilla Vim. They run a starter config (LazyVim, NvChad,
+kickstart, AstroNvim) with hundreds of opinionated keymaps. Whisperer scans
+those keymaps so the matcher and the LLM recommend the binding the user has.
+
+Sources:
+    - `vim.api.nvim_get_keymap` for `n`, `v`, `x`, `o`, `i` modes.
+    - Only entries with `desc` set are kept. (Set `desc` on your keymaps.)
+    - Detected starter distro: lazyvim / nvchad / kickstart / astronvim / plain.
+    - Detected motion-affecting plugins: flash, leap, surround variants, etc.
+    - Current buffer filetype.
+
+The bundle is rebuilt on `User LazyDone`, `User VeryLazy`, and `BufEnter`.
+Run |:WhispererRefreshContext| to force a rebuild after a `:source`.
+
+==============================================================================
+7. MACRO TEACHING FLOW                                    *whisperer-teach*
+
+When the LLM says no built-in does it (or the user presses `t`), Whisperer:
+    1. Tells the user to press <CR> to start recording.
+    2. Runs `qq` to begin recording into register `q`.
+    3. Waits for `RecordingLeave` (Neovim 0.10+).
+    4. Reads the captured keys.
+    5. Prompts for a name + description.
+    6. Saves to `stdpath('data')/whisperer/macros.json`.
+    7. The matcher includes saved macros; `:Whisperer <name>` replays it.
+
+==============================================================================
+8. PRIVACY                                              *whisperer-privacy*
+
+Whisperer does not send buffer contents, file paths, working directory, or
+env vars to the LLM. With `send_local_context = true` it sends: distro name,
+detected plugin names, keymap `lhs`+`desc`+mode (never `rhs`), and current
+filetype. Set `send_local_context = false` to send only the literal query.
+
+API keys are stored at `stdpath('data')/whisperer/config.json` with mode
+0600. Set the environment variables (ANTHROPIC_API_KEY, OPENAI_API_KEY,
+GEMINI_API_KEY) to skip on-disk storage; env vars take precedence over the
+file.
+
+vim:tw=78:ts=8:noet:ft=help:norl:

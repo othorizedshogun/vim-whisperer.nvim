@@ -1,0 +1,40 @@
+name: lint-and-test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  stylua:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: JohnnyMorganz/stylua-action@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          version: latest
+          args: --check .
+
+  luacheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: leafo/gh-actions-lua@v10
+        with:
+          luaVersion: "5.1"
+      - uses: leafo/gh-actions-luarocks@v4
+      - run: luarocks install luacheck
+      - run: luacheck lua/
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Neovim
+        run: |
+          curl -sLO https://github.com/neovim/neovim/releases/download/stable/nvim-linux-x86_64.tar.gz
+          tar xzf nvim-linux-x86_64.tar.gz
+          echo "$PWD/nvim-linux-x86_64/bin" >> $GITHUB_PATH
+      - run: nvim --version
+      - run: nvim --headless --noplugin -u NONE -l tests/run.lua

@@ -1,0 +1,6 @@
+*.swp
+*.swo
+.DS_Store
+doc/tags
+.luarocks/
+node_modules/

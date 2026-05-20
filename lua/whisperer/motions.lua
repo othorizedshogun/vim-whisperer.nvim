@@ -1,0 +1,101 @@
+return {
+  -- cursor motion
+  { phrases = { "go to top", "first line", "beginning of file" },
+    motion = "gg", explanation = "jump to first line", exists = true },
+  { phrases = { "go to bottom", "last line", "end of file" },
+    motion = "G", explanation = "jump to last line", exists = true },
+  { phrases = { "next word", "forward word" },
+    motion = "w", explanation = "move to start of next word", exists = true },
+  { phrases = { "previous word", "back word" },
+    motion = "b", explanation = "move to start of previous word", exists = true },
+  { phrases = { "end of word" },
+    motion = "e", explanation = "move to end of current word", exists = true },
+  { phrases = { "matching bracket", "matching paren", "match brace" },
+    motion = "%", explanation = "jump to matching bracket", exists = true },
+  { phrases = { "start of line", "first non-blank" },
+    motion = "^", explanation = "jump to first non-blank character of line", exists = true },
+  { phrases = { "end of line" },
+    motion = "$", explanation = "jump to end of line", exists = true },
+
+  -- deletion
+  { phrases = { "delete word", "kill word" },
+    motion = "dw", explanation = "delete from cursor to next word start", exists = true },
+  { phrases = { "delete line", "kill line", "remove line" },
+    motion = "dd", explanation = "delete the entire current line", exists = true },
+  { phrases = { "delete to end of line" },
+    motion = "D", explanation = "delete from cursor to end of line", exists = true },
+  { phrases = { "delete inside parens", "delete inside parentheses" },
+    motion = "di(", explanation = "delete text inside parentheses", exists = true },
+  { phrases = { "delete inside quotes", "delete inside string" },
+    motion = 'di"', explanation = "delete text inside double quotes", exists = true },
+  { phrases = { "delete around parens", "delete with parens" },
+    motion = "da(", explanation = "delete parentheses and contents", exists = true },
+
+  -- change
+  { phrases = { "change word" },
+    motion = "cw", explanation = "delete word and enter insert mode", exists = true },
+  { phrases = { "change inside quotes", "replace string contents" },
+    motion = 'ci"', explanation = "replace text inside double quotes", exists = true },
+  { phrases = { "replace character" },
+    motion = "r", explanation = "replace the character under cursor (then press new char)", exists = true },
+
+  -- yank/paste
+  { phrases = { "copy line", "yank line" },
+    motion = "yy", explanation = "yank (copy) entire current line", exists = true },
+  { phrases = { "paste below", "paste after" },
+    motion = "p", explanation = "paste after cursor", exists = true },
+  { phrases = { "paste above", "paste before" },
+    motion = "P", explanation = "paste before cursor", exists = true },
+  { phrases = { "yank to end of line", "copy to end of line" },
+    motion = "y$", explanation = "yank from cursor to end of line", exists = true },
+
+  -- search
+  { phrases = { "find next", "next match" },
+    motion = "n", explanation = "jump to next search match", exists = true },
+  { phrases = { "find previous", "previous match" },
+    motion = "N", explanation = "jump to previous search match", exists = true },
+  { phrases = { "search and replace", "find and replace in file" },
+    motion = ":%s/old/new/g<CR>", explanation = "replace all occurrences in file", exists = true },
+  { phrases = { "clear highlight", "clear search highlight" },
+    motion = ":noh<CR>", explanation = "clear last search highlighting", exists = true },
+
+  -- mode switching
+  { phrases = { "insert at end of line", "append at line end" },
+    motion = "A", explanation = "enter insert mode at end of line", exists = true },
+  { phrases = { "open line below", "new line below" },
+    motion = "o", explanation = "open new line below and enter insert mode", exists = true },
+  { phrases = { "open line above", "new line above" },
+    motion = "O", explanation = "open new line above and enter insert mode", exists = true },
+  { phrases = { "visual line", "select line" },
+    motion = "V", explanation = "enter visual line mode", exists = true },
+  { phrases = { "visual block", "block select" },
+    motion = "<C-v>", explanation = "enter visual block mode", exists = true },
+
+  -- line ops
+  { phrases = { "join lines", "merge lines" },
+    motion = "J", explanation = "join current line with next", exists = true },
+  { phrases = { "indent line", "shift right" },
+    motion = ">>", explanation = "indent current line one level", exists = true },
+  { phrases = { "outdent line", "shift left", "dedent" },
+    motion = "<<", explanation = "outdent current line one level", exists = true },
+  { phrases = { "move line down" },
+    motion = ":m +1<CR>", explanation = "move current line down one position", exists = true },
+  { phrases = { "move line up" },
+    motion = ":m -2<CR>", explanation = "move current line up one position", exists = true },
+
+  -- file ops
+  { phrases = { "save", "save file", "write file" },
+    motion = ":w<CR>", explanation = "save current buffer", exists = true },
+  { phrases = { "quit", "close", "exit" },
+    motion = ":q<CR>", explanation = "close current window", exists = true },
+  { phrases = { "save and quit", "write and close" },
+    motion = ":wq<CR>", explanation = "save and close current window", exists = true },
+  { phrases = { "force quit", "quit without saving" },
+    motion = ":q!<CR>", explanation = "close window discarding changes", exists = true },
+
+  -- undo/redo
+  { phrases = { "undo" },
+    motion = "u", explanation = "undo last change", exists = true },
+  { phrases = { "redo" },
+    motion = "<C-r>", explanation = "redo last undone change", exists = true },
+}

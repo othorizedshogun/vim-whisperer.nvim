@@ -4,3 +4,8 @@
 doc/tags
 .luarocks/
 node_modules/
+
+# env files (restored by security fix)
+.env
+.env.*
+!.env.example
